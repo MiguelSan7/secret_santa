@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -94,6 +95,12 @@ export default function Home() {
           </div>
         )}
       </form>
+
+      <Link href="/quien">
+        <button className="mt-6 bg-[#16213e] hover:bg-[#0f3460] text-pink-300 border-2 border-pink-400 px-6 py-3 rounded-lg pixel shadow-lg active:scale-95 transition-transform">
+          🎁 Ver quién me tocó
+        </button>
+      </Link>
     </main>
   );
 }
