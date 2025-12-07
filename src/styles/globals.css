@@ -24,3 +24,11 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.pixel {
+  font-family: "Press Start 2P", cursive;
+}
+
+.input {
+  @apply w-full px-3 py-2 rounded bg-[#0f3460] text-white my-2 border border-pink-400;
+}
