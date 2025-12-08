@@ -32,15 +32,28 @@ export default function Who() {
     setError("");
     setResult(null);
 
-    const { data, error: queryError } = await supabase
+    // Normalizar el nombre: quitar espacios extra, convertir a minúsculas, normalizar caracteres
+    const normalizedInput = name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    // Obtener todos los participantes para hacer búsqueda flexible
+    const { data: allParticipants, error: queryError } = await supabase
       .from("participants")
-      .select("*, assigned_to(name, wish1, wish2, wish3, link1, link2, link3)")
-      .eq("name", name.trim())
-      .single();
+      .select("*, assigned_to(name, wish1, wish2, wish3, link1, link2, link3)");
 
     setLoading(false);
 
-    if (queryError || !data) {
+    if (queryError || !allParticipants) {
+      setError("Error al consultar la base de datos.");
+      return;
+    }
+
+    // Buscar coincidencia flexible
+    const data = allParticipants.find(p => {
+      const normalizedName = p.name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      return normalizedName === normalizedInput;
+    });
+
+    if (!data) {
       setError("No se encontró tu nombre. Verifica que esté escrito exactamente como lo registraste.");
       return;
     }
