@@ -27,6 +27,44 @@ export default function Admin() {
     setLoading(false);
   }
 
+  async function handleSendMessages() {
+    if (!confirm("¿Enviar mensajes de WhatsApp a todos los participantes?")) {
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const res = await fetch("/api/send-messages", { method: "POST" });
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage(`✅ Mensajes: ${data.success} enviados, ${data.failed} fallidos`);
+        
+        console.log("=== RESULTADO DE ENVÍO ===");
+        console.log("Exitosos:", data.results);
+        console.log("Fallidos:", data.errors);
+        
+        if (data.failed > 0) {
+          const errorDetails = data.errors.map((e: any) => 
+            `${e.name} (${e.phone}): ${e.error}`
+          ).join('\n');
+          
+          alert(`⚠️ ERRORES DETECTADOS:\n\n${errorDetails}\n\nRevisa la consola (F12) para más detalles`);
+        }
+      } else {
+        setError(data.error || "Error al enviar mensajes");
+      }
+    } catch (err) {
+      setError("Error de conexión");
+      console.error("Error completo:", err);
+    }
+
+    setLoading(false);
+  }
+
   async function handleReset() {
     if (!confirm("¿Estás seguro de borrar todas las asignaciones?")) {
       return;
@@ -69,6 +107,14 @@ export default function Admin() {
           </button>
 
           <button
+            onClick={handleSendMessages}
+            disabled={loading}
+            className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-700 text-white p-4 rounded-lg pixel text-lg shadow-lg active:scale-95 transition-transform"
+          >
+            {loading ? "Enviando..." : "📱 Enviar Mensajes WhatsApp"}
+          </button>
+
+          <button
             onClick={handleReset}
             disabled={loading}
             className="w-full bg-red-500 hover:bg-red-600 disabled:bg-red-700 text-white p-4 rounded-lg pixel text-lg shadow-lg active:scale-95 transition-transform"
@@ -92,9 +138,10 @@ export default function Admin() {
         <div className="mt-6 bg-[#16213e] p-4 rounded-lg border border-pink-400">
           <h2 className="pixel text-sm text-pink-300 mb-2">ℹ️ Instrucciones:</h2>
           <ul className="text-sm space-y-2 text-gray-300">
-            <li>• <strong>Realizar Sorteo:</strong> Asigna a cada persona quién le toca</li>
+            <li>• <strong>Realizar Sorteo:</strong> Asigna a cada persona quién le toca y genera códigos únicos</li>
+            <li>• <strong>Enviar Mensajes:</strong> Envía por WhatsApp el código de acceso a cada participante</li>
             <li>• <strong>Resetear:</strong> Borra todas las asignaciones para volver a sortear</li>
-            <li>• Solo puedes sortear una vez (hasta que resetees)</li>
+            <li>• Los participantes verán sus resultados en /resultado con su código</li>
           </ul>
         </div>
       </div>

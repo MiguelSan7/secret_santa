@@ -15,6 +15,7 @@ export default function Home() {
 
     const { error } = await supabase.from("participants").insert({
       name: form.get("name"),
+      phone: form.get("phone"),
       wish1: form.get("wish1"),
       wish2: form.get("wish2"),
       wish3: form.get("wish3"),
@@ -43,6 +44,17 @@ export default function Home() {
           required 
           placeholder="Escribe tu nombre aquí" 
           className="input mb-4" 
+        />
+
+        <label className="block text-pink-200 text-sm mb-1 pixel">Tu teléfono (WhatsApp) *</label>
+        <input 
+          name="phone" 
+          required 
+          type="tel"
+          placeholder="+52 123 456 7890" 
+          className="input mb-4"
+          pattern="[\+]?[0-9\s]+"
+          title="Ingresa un número válido con código de país (+52 para México)"
         />
 
         <h2 className="text-pink-300 mt-2 mb-3 pixel text-lg">Tus deseos</h2>
@@ -96,11 +108,15 @@ export default function Home() {
         )}
       </form>
 
-      <Link href="/quien">
+      <Link href="/resultado">
         <button className="mt-6 bg-[#16213e] hover:bg-[#0f3460] text-pink-300 border-2 border-pink-400 px-6 py-3 rounded-lg pixel shadow-lg active:scale-95 transition-transform">
-          🎁 Ver quién me tocó
+          🎁 Ver mi resultado
         </button>
       </Link>
+      
+      <p className="mt-3 text-pink-200 text-xs text-center">
+        Recibirás tu código de acceso por WhatsApp
+      </p>
     </main>
   );
 }

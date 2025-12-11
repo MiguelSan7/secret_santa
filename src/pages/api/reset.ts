@@ -25,13 +25,16 @@ export default async function handler(
     return res.status(400).json({ error: "No hay participantes" });
   }
 
-  // Limpiar todas las asignaciones uno por uno
+  // Limpiar todas las asignaciones y códigos uno por uno
   for (const person of people) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabaseAdmin.from("participants") as any)
-      .update({ assigned_to: null })
+      .update({ 
+        assigned_to: null,
+        access_code: null 
+      })
       .eq("id", person.id);
   }
 
-  return res.json({ ok: true, message: "Asignaciones limpiadas", count: people.length });
+  return res.json({ ok: true, message: "Asignaciones y códigos limpiados", count: people.length });
 }

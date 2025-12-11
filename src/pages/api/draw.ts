@@ -1,9 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import crypto from "crypto";
 
 interface Participant {
   id: number;
   name: string;
+  phone: string | null;
   wish1: string | null;
   wish2: string | null;
   wish3: string | null;
@@ -11,6 +13,7 @@ interface Participant {
   link2: string | null;
   link3: string | null;
   assigned_to: number | null;
+  access_code: string | null;
 }
 
 interface Update {
@@ -75,12 +78,21 @@ export default async function handler(
     );
   }
 
+  // Generar códigos únicos y actualizar asignaciones
   for (const u of updates) {
+    const accessCode = crypto.randomBytes(4).toString('hex'); // Genera código de 8 caracteres
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabaseAdmin.from("participants") as any)
-      .update({ assigned_to: u.assigned_to })
+      .update({ 
+        assigned_to: u.assigned_to,
+        access_code: accessCode 
+      })
       .eq("id", u.id);
   }
 
-  return res.json({ ok: true });
+  // Enviar mensajes de WhatsApp (opcional - implementar después)
+  // await sendWhatsAppMessages(people, updates);
+
+  return res.json({ ok: true, message: "Sorteo realizado y códigos generados" });
 }
